@@ -34,7 +34,6 @@ namespace BotTemplate
                 Console.Write("Input Token: ");
                 var token = Console.ReadLine();
                 var json = JsonConvert.SerializeObject(new {Token = token});
-                ;
                 File.WriteAllText(directory, json);
             }
 
