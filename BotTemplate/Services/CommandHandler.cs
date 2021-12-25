@@ -8,22 +8,21 @@ namespace BotTemplate.Services
 {
     public class CommandHandler
     {
-        private readonly DiscordShardedClient _discord;
+        private readonly DiscordShardedClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _provider;
 
-        // DiscordSocketClient, CommandService, IConfigurationRoot, and IServiceProvider are injected automatically from the IServiceProvider
         public CommandHandler(
-            DiscordShardedClient discord,
+            DiscordShardedClient client,
             CommandService commands,
             IConfigurationRoot config,
             IServiceProvider provider)
         {
-            _discord = discord;
+            _client = client;
             _commands = commands;
             _provider = provider;
 
-            _discord.MessageReceived += HandleCommandAsync;
+            _client.MessageReceived += HandleCommandAsync;
         }
 
         private async Task HandleCommandAsync(SocketMessage arg)
@@ -31,19 +30,18 @@ namespace BotTemplate.Services
             if (arg is not SocketUserMessage msg)
                 return;
 
-            if (msg.Author.Id == _discord.CurrentUser.Id || msg.Author.IsBot)
+            if (msg.Author.Id == _client.CurrentUser.Id || msg.Author.IsBot)
                 return;
 
             var pos = 0;
-            if (msg.HasStringPrefix("*", ref pos) || msg.HasMentionPrefix(_discord.CurrentUser, ref pos))
+            if (msg.HasStringPrefix("*", ref pos) || msg.HasMentionPrefix(_client.CurrentUser, ref pos))
             {
-                var context = new ShardedCommandContext(_discord, msg);
+                var context = new ShardedCommandContext(_client, msg);
                 var result = await _commands.ExecuteAsync(context, pos, _provider);
 
                 if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
                     await msg.Channel.SendMessageAsync(result.ErrorReason);
             }
-
         }
     }
 }

@@ -53,7 +53,7 @@
         /// <summary>
         /// Gets the client
         /// </summary>
-        public IDiscordClient Discord { get; }
+        private IDiscordClient Discord { get; }
 
         /// <summary>
         /// waits for the next message in the channel
@@ -106,7 +106,7 @@
         /// </returns>
         public async Task<SocketMessage> NextMessageAsync(SocketCommandContext context, ICriterion<SocketMessage> criterion, TimeSpan? timeout = null)
         {
-            timeout = timeout ?? defaultTimeout;
+            timeout ??= defaultTimeout;
 
             var eventTrigger = new TaskCompletionSource<SocketMessage>();
 
@@ -182,7 +182,7 @@
         /// </returns>
         public async Task<IUserMessage> ReplyAndDeleteAsync(SocketCommandContext context, string content, bool isTTS = false, Embed embed = null, TimeSpan? timeout = null, RequestOptions options = null)
         {
-            timeout = timeout ?? defaultTimeout;
+            timeout ??= defaultTimeout;
             var message = await context.Channel.SendMessageAsync(content, isTTS, embed, options).ConfigureAwait(false);
             _ = Task.Delay(timeout.Value)
                 .ContinueWith(_ => message.DeleteAsync().ConfigureAwait(false))
@@ -214,7 +214,7 @@
         public async Task<IUserMessage> ErrorAsync(SocketCommandContext context, string content, bool isTTS = false, TimeSpan? timeout = null, RequestOptions options = null)
         {
             var embed = new EmbedBuilder { Title = "Error", Description = content, Color = new Color(255, 0, 0) }.Build();
-            timeout = timeout ?? defaultTimeout;
+            timeout ??= defaultTimeout;
             var message = await context.Channel.SendMessageAsync(null, isTTS, embed, options).ConfigureAwait(false);
             _ = Task.Delay(timeout.Value)
                 .ContinueWith(_ => message.DeleteAsync().ConfigureAwait(false))
@@ -291,7 +291,7 @@
         /// <param name="id">
         /// The id.
         /// </param>
-        public void RemoveReactionCallback(ulong id) => callbacks.Remove(id);
+        private void RemoveReactionCallback(ulong id) => callbacks.Remove(id);
 
         /// <summary>
         /// Clears all reaction callbacks
@@ -303,13 +303,14 @@
         /// </summary>
         public void Dispose()
         {
-            if (Discord is DiscordShardedClient shardedClient)
+            switch (Discord)
             {
-                shardedClient.ReactionAdded -= HandleReactionAsync;
-            }
-            else if (Discord is DiscordSocketClient socketClient)
-            {
-                socketClient.ReactionAdded -= HandleReactionAsync;
+                case DiscordShardedClient shardedClient:
+                    shardedClient.ReactionAdded -= HandleReactionAsync;
+                    break;
+                case DiscordSocketClient socketClient:
+                    socketClient.ReactionAdded -= HandleReactionAsync;
+                    break;
             }
         }
 
@@ -367,7 +368,7 @@
                 return;
             }
 
-            if (!(await callback.Criterion.JudgeAsync(callback.Context, reaction).ConfigureAwait(false)))
+            if (!await callback.Criterion.JudgeAsync(callback.Context, reaction).ConfigureAwait(false))
             {
                 return;
             }

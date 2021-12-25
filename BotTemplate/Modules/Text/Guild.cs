@@ -6,9 +6,8 @@ using BotTemplate.Database.Repositories;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
-using SQLitePCL;
 
-namespace BotTemplate.Modules
+namespace BotTemplate.Modules.Text
 {
     public class GuildCommands : InteractiveBase
     {
@@ -21,7 +20,7 @@ namespace BotTemplate.Modules
             _repos = repos;
         }
 
-        [Command("stealemoji"), RequireUserPermission(GuildPermission.ManageEmojis)]
+        [Command("stealemoji"), RequireUserPermission(GuildPermission.ManageEmojisAndStickers)]
         public async Task StealEmojiAsync(Emote emote)
         {
             await using var stream = new MemoryStream(await _factory.CreateClient().GetByteArrayAsync(emote.Url));
@@ -29,7 +28,7 @@ namespace BotTemplate.Modules
             var addedEmote = await Context.Guild.CreateEmoteAsync(emote.Name, new Image(stream));
             await OkAsync($"Added {addedEmote}");
         }
-        [Command("addemoji"), RequireUserPermission(GuildPermission.ManageEmojis)]
+        [Command("addemoji"), RequireUserPermission(GuildPermission.ManageEmojisAndStickers)]
         public async Task StealEmojiAsync(string name, string url)
         {
             await using var stream = new MemoryStream(await _factory.CreateClient().GetByteArrayAsync(url));
@@ -63,7 +62,7 @@ namespace BotTemplate.Modules
         private Guild GetGuild(IGuild guild)
         {
             var dbguild = _repos.Guild.Get(guild.Id);
-            if (dbguild != null) 
+            if (dbguild is not null) 
                 return dbguild;
             dbguild ??= new Database.Models.Guild
             {

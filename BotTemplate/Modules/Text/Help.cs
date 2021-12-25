@@ -3,7 +3,7 @@ using Discord.Addons.CommandsExtension;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 
-namespace BotTemplate.Modules
+namespace BotTemplate.Modules.Text
 {
     public class Help : InteractiveBase
     {

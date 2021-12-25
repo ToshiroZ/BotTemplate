@@ -6,7 +6,7 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 
-namespace BotTemplate.Modules
+namespace BotTemplate.Modules.Text
 {
     public class Owner : InteractiveBase
     {

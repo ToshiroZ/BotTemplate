@@ -1,13 +1,9 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 
-namespace BotTemplate.Modules
+namespace BotTemplate.Modules.Text
 {
     
     public class Bot : InteractiveBase

@@ -22,7 +22,7 @@ namespace BotTemplate.Database
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=BotData.db");
+            optionsBuilder.UseSqlite("Data Source=BotData.db").UseLazyLoadingProxies();
         }
         public DbSet<User> Users { get; set; }
         public DbSet<Guild> Guilds { get; set; }
